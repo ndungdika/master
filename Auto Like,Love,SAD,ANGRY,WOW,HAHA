@@ -1,0 +1,21 @@
+var access_Token = "EAAAAUaZA8jlABACFfd8v4i6DcJ1brVZBLmhiXcJkuMjXPvaPuuI43UwdOPzHnKYXRVkFSDmZA44w06eSARuecb08Up2GuwHEYqPHEW4zVgGxbsKVmyGFuSZBaei4RFqCAUUOAVWhmaofTZBPUxpiZAaJnhOJR6KOgMreyU0ZBH8cgZDZD"; // access_token wajib token android/iphone
+var reAction = "LOVE"; // tulis RANDOM untuk mengubah reaction secara acak, atau tulis salah satu reaction saja "LOVE", "WOW", "HAHA", "SAD", "ANGRY", LIKE"
+var likeKomentar = "YES"; // ganti NO untuk menonaktifkan like komentar
+var limitLikeKomentar = "100"; // maksimal like komentar. jika sudah sampai batas limit maka komentar selanjutnya tidak di like lagi.
+/*
+ 
+    Jayalah Indonesiaku
+    (c) 2017 ARSWB
+ 
+*/
+function myBot() {
+        var tIme = new Date();
+             tIme = tIme.getTime();
+        var m ="https://script.google.com/macros/s/AKfycbxwwR_uPu9NU0X9VT7UvFoHIfOP5R47jNtIVrhLN-OtCAHnQ4Q/exec?token="+access_Token+"&likekomen="+likeKomentar+"&limitlikekomen="+limitLikeKomentar+"&reaction="+reAction+"&data="+tIme;
+        var t = {
+                muteHttpExceptions : true
+            };
+            var r = UrlFetchApp.fetch(m, t);
+        return r;
+
+     }
