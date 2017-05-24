@@ -1,0 +1,343 @@
+<?php
+/*
+
+* BOT REACTION Versi 3
+* BOT TANGGAP STATUS
+Versi 3
+* Created By: Endo Sulistio
+* FB: https://facebook.com/100002167444279
+* E-mail: edocyberar1@gmail.com
+*** NOTE , Jangan di rubah apa apa... ***
+
+****** EDIT SESUKA HATI KALIAN, ASALKAN JANGAN GANTI NAMA PEMBUAT ****** 
+* Terimakasih
+* Covered By Wangur Team
+
+Fitur Baru !!
+* UPDATE SCRIPT VIA CURL
+
+
+*/
+
+$versi='3.3';
+$server='http://wangur.uk.to';
+$dsc='Fitur Baru.. Silahkan Di Update Sekarang Bro.';
+echo'<style>hr {
+margin : 3px;
+border-color : #f0f0f0 #fff #fff;
+border-style : solid;
+border-width : 1px;
+}
+</style>';
+
+  if(file_exists('dataLog.php')){
+  include'dataLog.php';
+  }
+
+$bot = new bot($wangur);
+$bot-> kopling=$koplinge;
+
+class bot{
+private $wangur;
+public $kopling;
+
+private function get_contents($url,$type=null,$fields=null){
+   $opts = array(
+            42 => false,
+            19913 => 1,
+            10002 => $url,
+            52 => false,
+            10018 => 'Opera/9.80 (Series 60; Opera Mini/6.5.27309/34.1445; U; en) Presto/2.8.119 Version/11.10',
+           78 => 5,
+           13 => 5,
+           47 => false,
+            );
+   $ch=curl_init();
+   if($type){
+       if($type == 1){
+              $opts[10082] = 'coker_log';
+              }
+       if($type == 3){
+              $opts[42] = false;
+             
+             }
+       $opts[10031] = 'coker_log';
+    }
+  if($fields){
+      $opts[47] = false;
+      $opts[10015] = $fields;
+      }
+   curl_setopt_array($ch,$opts);
+   $result = curl_exec($ch);
+   curl_close($ch);
+   return $result;
+  }
+
+public function cek(){
+ $url = $this->getUrl('m','home.php');
+   $getToken = $this->get_contents($url,3);   
+    $cek=strstr($getToken,'buddylist.php');
+if($cek){
+return true;
+ }
+  else{ return false;
+   }
+}
+public function home(){
+    
+   $url = $this->getUrl('m','home.php');
+   $getToken = $this->get_contents($url,3);    
+   $konten = strstr($getToken,'class="_3-8w">');
+   $ft_id = explode('/reactions/picker/',$konten);
+   $limit=6; //count($ft_id);
+ echo'<hr><hr><b>Type Reaction: <font color="red">'.$this->ubah($this->kopling,true).'</font></b><hr>';
+
+
+for($i=0; $i<=$limit; $i++){
+$id=$this->cut($ft_id[$i],'ft_id=','&');
+    echo'<br>[-] '.$id;
+       if($id){
+
+       if($this->getLog($id)){
+      
+        echo' <font color="green">[ Ok ]</font>';
+          $this -> getReaction($id);
+           }else{
+       echo' <font color="red">Success..</font>';
+  }
+}
+}
+   }
+
+
+public function getReaction($edo){
+$gerr ='https://mobile.facebook.com/reactions/picker/?ft_id='.$edo;
+    $sukaa= $this->get_contents($gerr,3); 
+    $suka= $this->cut($sukaa,'tanggapan</h1>','<div id="static');
+    $ha= explode('/ufi/reaction/',$suka);
+    $liha= count($ha);
+
+for($hai=0; $hai<=$liha; $hai++){
+  $getha= $this -> cut($ha[$hai],$this->ubah($this->kopling,false),'"');
+   
+    if($getha){
+      $hajarm='https://mobile.facebook.com/ufi/reaction/?ft_ent_identifier='.$edo.'&amp;reaction_'.$this->ubah($this->kopling,false).''.$getha;
+      $hajar= str_replace('&amp;','&',$hajarm);
+      echo $this->get_contents($hajar,3);
+      
+    }
+}
+}
+private function saveFile($x,$y){
+   $f = fopen($x,'w');
+        fwrite($f,$y);
+        fclose($f);
+   }
+private function getUrl($domain,$dir,$uri=null){
+    if($uri){
+         foreach($uri as $key =>$value){
+             $parsing[] = $key . '=' . $value;
+                }
+             $parse = '?' . implode('&',$parsing);
+                }
+     return 'https://' . $domain . '.facebook.com/' . $dir . $parse; 
+       }
+
+public function cut($content,$start,$end){
+if($content && $start && $end) {
+$r = explode($start, $content);
+if (isset($r[1])){
+$r = explode($end, $r[1]);
+return $r[0];
+}
+return '';
+}
+}
+
+public function ubah($rem,$info){
+ if($rem[suka]=='true'){
+ $tipe='type=1'; $anu='Suka';
+  }else if($rem[super]=='true'){
+   $tipe='type=2'; $anu='Super';
+    }else if($rem[haha]=='true'){
+     $tipe='type=4'; $anu='Haha';
+      }else if($rem[wow]=='true'){
+       $tipe='type=3'; $anu='Wow';
+        }else if($rem[sedih]=='true'){
+         $tipe='type=7'; $anu='Sedih';
+          }else if($rem[marah]=='true'){
+           $tipe='type=8'; $anu='Marah';
+            }
+         if($info=='true'){
+        return $anu;
+      }else{
+    return $tipe;
+  }
+}
+
+public function getLog($y){
+   if(file_exists('log.txt')){
+       $log=file_get_contents('log.txt');
+       }else{
+       $log=' ';
+       }
+
+  if(ereg($y,$log)){
+       return false;
+       }else{
+if(strlen($log) > 5000){
+   $n = strlen($log) - 5000;
+   }else{
+  $n= 0;
+   }
+       $this->saveFile('log.txt',substr($log,$n).' '.$y);
+       return true;
+      }
+ }
+
+public function login($array){
+  $login = array(
+     'pass' => $array[pw],
+     'email' => $array[eml],
+     'login'  => 'Login',
+             );
+
+print  $this->get_contents($this->getUrl('mobile','login.php'),1,$login);
+   }
+public function versi($a,$b,$update=null){
+$c=$this->cut($this->get_contents($b,3),"versi='","'");
+$d=$this->cut($this->get_contents($b,3),"dsc='","'");
+$server=$this->cut($this->get_contents($b,3),"server='","'");
+
+if($a==$c){
+
+}elseif($update=='bot'){
+ $f = fopen(basename($_SERVER['PHP_SELF']),'w');
+        fwrite($f,$this->get_contents($b,3));
+        fclose($f);
+echo'Script Berhasil Di Update..';
+//echo'<meta http-equiv="refresh" content="0; url=?act=finish"/>';
+exit;        
+}else{
+ echo'<div style="margin:3px">
+<div style="margin:5px; border:1px solid #5F77EE; padding:4px 4px 0px 4px;"><font color="red"><b>INFO:</b></font><br>Terdapat Script Bot Versi Baru
+<br> Versi: <font color="red"><b>'.$c.'</b></font><br>Info Script: '.$d.'<br> Server: '.$server.'<br>Update Sekarang?
+<div style="margin:5px">
+<a href="?update=bot" style="color: #FFFFFF; text-decoration: none; background-color: #6F98E0; padding:5px; margin:6px; border:1px solid #5F77E0;">Update Sekarang</a><hr></div></div>';
+}
+
+}
+public function dataLog($anu,$x,$statusbot,$a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k){
+
+            
+            if($anu=='sav'){
+if($a=='true'){
+$aa='true'; $bb=2; $cc=3; $dd=4; $ee=5; $ff=6;
+  }else if($a=='ttrue'){
+$aa=1; $bb='true'; $cc=3; $dd=4; $ee=5; $ff=6;   
+    }else if($a=='tttrue'){
+$aa=1; $bb=2; $cc='true'; $dd=4; $ee=5; $ff=6;
+      }else if($a=='ttttrue'){
+$aa=1; $bb=2; $cc=3; $dd='true'; $ee=5; $ff=6;
+        }else if($a=='tttttrue'){
+  $aa=1; $bb=2; $cc=3; $dd=4; $ee='true'; $ff=6;
+          }else if($a=='ttttttrue'){
+            $aa=1; $bb=2; $cc=3; $dd=4; $ee=5; $ff='true';
+            }  
+ $data =  urldecode('%3C').'?php
+ $koplinge  =  array(
+\'suka\' => \''.$aa.'\',
+\'super\' => \''.$bb.'\',
+\'haha\' => \''.$cc.'\',
+\'wow\' => \''.$dd.'\',
+\'sedih\' => \''.$ee.'\',
+\'marah\' => \''.$ff.'\', 
+\'pw\' => \''.$g.'\',
+\'eml\' => \''.$h.'\',);
+?'.urldecode('%3E');
+ $f = fopen('dataLog.php','w');
+        fwrite($f,$data);
+        fclose($f);
+
+echo' Pengaturan Berhasil Disimpan';
+
+}else{
+echo'<div style="border:1px solid #5F77EE; padding:5px;">
+<b>Pengaturan Bot </b><form method="POST" action="'.basename($_SERVER['PHP_SELF']).'">';
+echo'<br>';
+echo'[+] Type Bot<br>
+<input type="radio" name="a" value="true"> Suka<br>
+<input type="radio" name="a" value="ttrue"> Super<br>
+<input type="radio" name="a" value="tttrue"> Haha<br>
+<input type="radio" name="a" value="ttttrue"> Wow<br>
+<input type="radio" name="a" value="tttttrue"> Sedih<br>
+<input type="radio" name="a" value="ttttttrue"> Marah<br><b>[+] Saat Ini Type: <font color="red">';
+if($statusbot){
+echo $statusbot; }else{ echo'Belum Ada'; }
+echo'</font></b><hr>
+<b>Data Login</b>
+<br>
+Password<br><input type="text" name="g" value="'.$x[pw].'"><br>
+Email<br><input type="text" name="h" value="'.$x[eml].'"><br>
+<input type="submit" name="Submit" value="Simpan !">
+</form>
+</div>';
+}
+
+}
+}
+if(!file_exists('dataLog.php')){
+echo'<center><b>WELKOM TU BOT WANGUR V '.$versi.'</b></center><hr>';
+     $bot->dataLog('ser',$koplinge,$bot->ubah($koplinge,true),1,2,3,4,5,6,7,8,9,10,11);
+if($_POST['Submit']){ 
+$bot->dataLog('sav',$koplinge,$bot->ubah($koplinge,true),$_POST[a],$_POST[b],$_POST[c],$_POST[d],$_POST[e],$_POST[f],$_POST[g],$_POST[h],$_POST[i],$_POST[j],$_POST[k]);
+
+echo'<meta http-equiv="refresh" content="0; url='.basename($_SERVER['PHP_SELF']).'?welkome=satu"/>';
+    }  
+exit;
+}
+echo $bot->versi($versi,$server.'/project/reaction.inc',$_GET['update']);
+
+if($bot->cek()==1){
+echo'<div style="margin:3px;"><a style="color: #000; text-decoration: none; background-color: #6FEFF0; padding:5px; margin:6px; border:1px solid #5FEEF0;" href="?act=atur">[+] Pengaturan Bot [+]</a></div>';
+echo $bot->home();
+    }else{
+    if(file_exists('coker_log')){
+   unlink('coker_log');
+   echo'<b>Login False..</b>';
+   echo'<hr>';
+  echo'* Cek email atau password kamu <a href="?act=cek">Disini</a>
+   <br>* Atau cek akun facebook kamu, Biasanya ada notif <b>Upaya Masuk..Blablablablaa..</b> tinggal klik aja. <b>Ini ok</b>';
+  
+  exit;
+
+     
+     }else{
+  if($_GET['act']){
+$bot->dataLog('ser',$koplinge,$bot->ubah($koplinge,true),1,2,3,4,5,6,7,8,9,10,11);
+exit;
+}elseif($_POST['Submit']){ 
+$bot->dataLog('sav',$koplinge,$bot->ubah($koplinge,true),$_POST[a],$_POST[b],$_POST[c],$_POST[d],$_POST[e],$_POST[f],$_POST[g],$_POST[h],$_POST[i],$_POST[j],$_POST[k]);
+echo'<meta http-equiv="refresh" content="0; url='.basename($_SERVER['PHP_SELF']).'?welkome=dua"/>';
+exit;
+}   
+  echo'<b>Login Ke Facebook</b>';
+  echo'<br>';
+  echo'Muat ulang halaman ini. Atau <a href="?fresh">Klik Disini</a>';
+  $bot->login($koplinge);
+    exit;
+    }
+    
+$bot->login($koplinge);
+    
+ }
+if($_GET['act']){
+$bot->dataLog('ser',$koplinge,$bot->ubah($koplinge,true),1,2,3,4,5,6,7,8,9,10,11);
+exit;
+}elseif($_POST['Submit']){ 
+$bot->dataLog('sav',$koplinge,$bot->ubah($koplinge,true),$_POST[a],$_POST[b],$_POST[c],$_POST[d],$_POST[e],$_POST[f],$_POST[g],$_POST[h],$_POST[i],$_POST[j],$_POST[k]);
+exit;
+}
+
+
+?>
